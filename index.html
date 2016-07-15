@@ -1,0 +1,43 @@
+<!-- saved from url=(0055)http://logicbomb.github.io/ng-directives/drag-drop.html -->
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Drag and Drop Demo</title>
+    
+    <script src="./source/jquery-2.2.4.js"></script>
+    <script src="./source/angular.js"></script>
+    <script src="form-builder.js"></script>
+    <link href="./source/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="source/css/bootstrap-combined.min.css">
+    <link href="./source/css/myCss.css" rel="stylesheet">
+    <script type="text/javascript" src="source/bootstrap.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+</head>
+
+<body ng-app="app" class="ng-scope">
+    <div ng-controller="demoController" style="margin-top:50px;">
+        <div class="maxHeight">
+            <data-form-builder></data-form-builder>
+        </div>
+    <div class="clearfix"></div>
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <button type="button" class="btn btn-warning" id="clear-selection">Clear Selection</button>
+                
+        </div>
+            <button type="button" class="btn btn-info" id="calculate">Show Table Info</button>
+            <button  x-lvl-draggable="true" ondragstart="drag(event)"
+            type="button" class="btn btn-info" id="table_button" >Table</button>
+
+            <button  draggable="true" ondragstart="drag(event)"
+            type="button" class="btn btn-info" id="drag_me">Drag Me</button>
+    </div>
+    
+    <div class="input-append">
+        <textarea class="span12" id="text" rows="5"></textarea>
+    </div>
+    </div>
+</body>
+
+</html>
