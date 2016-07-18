@@ -136,6 +136,7 @@ module.directive('formBuilder', ['$rootScope', function($rootScope) {
                 el.on("mouseover","td.selectable",function(e){
                     var currentTd = angular.element(e.target);
                     scope.drawing(e.target);
+
                 });
 
 

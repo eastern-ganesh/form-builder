@@ -7,11 +7,15 @@
     
     <script src="./source/jquery-2.2.4.js"></script>
     <script src="./source/angular.js"></script>
-    <script src="form-builder.js"></script>
     <link href="./source/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="source/css/bootstrap-combined.min.css">
     <link href="./source/css/myCss.css" rel="stylesheet">
     <script type="text/javascript" src="source/bootstrap.min.js"></script>
+
+    <script src="./source/lvl-uuid.js"></script>
+    <script src="drag-drop.js"></script>
+    <script src="drag-drop.js"></script>
+    <script src="form-builder.js"></script>
     <script type="text/javascript" src="app.js"></script>
 </head>
 
@@ -20,23 +24,15 @@
         <div class="maxHeight">
             <data-form-builder></data-form-builder>
         </div>
-    <div class="clearfix"></div>
-    <div class="btn-toolbar">
-        <div class="btn-group">
-            <button type="button" class="btn btn-warning" id="clear-selection">Clear Selection</button>
-                
-        </div>
-            <button type="button" class="btn btn-info" id="calculate">Show Table Info</button>
-            <button  x-lvl-draggable="true" ondragstart="drag(event)"
-            type="button" class="btn btn-info" id="table_button" >Table</button>
-
-            <button  draggable="true" ondragstart="drag(event)"
-            type="button" class="btn btn-info" id="drag_me">Drag Me</button>
-    </div>
+        <div class="clearfix"></div>
     
-    <div class="input-append">
-        <textarea class="span12" id="text" rows="5"></textarea>
-    </div>
+        <div class="btn-toolbar">
+            <button type="button" class="btn btn-info" id="calculate">Show Table Info</button>
+            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="table_button">Table</button>
+            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="drag_me">Drag Me</button>
+        </div>
+
+        <textarea class="span12" id="text" rows="5" id="dropHere" class="input-append"></textarea>
     </div>
 </body>
 

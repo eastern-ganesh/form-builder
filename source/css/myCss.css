@@ -1,24 +1,33 @@
 .selectable.selected {
-        background: #f90;
-    }
+    background: #f90;
+}
 
-    .selectable.droppedClass {
-        background: #f90;
-    }
-    .lastClass{
-    	resize: both;
-    	overflow: auto;
-    }    
-    table.table-block tr td.selectable{
-    	height: 50px;
-    }
-    .maxHeight{
-    	display: block;
-    	height: 470px;
-    	width: 95%;
-    	overflow-x: auto;
-    	padding: 2%;
-    }
-    .clearfix{
-    	clear: both;
-    }
+.selectable.droppedClass {
+    background: #f90;
+}
+
+.lastClass {
+    resize: both;
+    overflow: auto;
+}
+
+table.table-block tr td.selectable {
+    height: 50px;
+}
+
+.maxHeight {
+    display: block;
+    height: 470px;
+    width: 95%;
+    overflow-x: auto;
+    padding: 2%;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.lvl-over {
+    /* applied to a drop target when a draggable object is over it */
+    border: 2px dashed black !important;
+}
