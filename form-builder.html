@@ -1,5 +1,5 @@
-<table class="table table-condensed table-bordered table-block" width="100%" id="table">
+<table class="table table-condensed table-bordered table-block" width="100%" id="table" x-tab-builder="true">
     <tr ng-repeat="i in getNumber(selectedRows) track by $index">
-        <td  x-lvl-drop-target="true" x-on-drop="dropped(dragEl, dropEl)" ng-repeat="j in getNumber(selectedCols) track by $index" class="selectable"></td>
+        <td x-lvl-drop-target="true" x-on-drop="dropped(dragEl, dropEl)" ng-repeat="j in getNumber(selectedCols) track by $index" class="selectable"></td>
     </tr>
 </table>

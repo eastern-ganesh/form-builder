@@ -39,13 +39,7 @@ var formBuilderController = function($scope) {
     $scope.drawing = function(element) {
         var currentTd = angular.element(element);
         if ($scope.isMouseDown && currentTd.hasClass("selectable")) {
-            if(currentTd.closest("tr").is(":last-child")){
-                var cloneTr = currentTd.closest("tr");
-                $scope.table.append(cloneTr.clone());
-                $(".maxHeight").scrollTop($scope.table.height());
-                //TODO
-                //angular.element(".maxHeight").scrollTop($scope.table.height());
-            }
+
 
             if (!currentTd.hasClass('recent')) {
                 currentTd.addClass("selected").addClass('recent');
@@ -115,11 +109,18 @@ var formBuilderController = function($scope) {
         angular.element('td.selectable').removeClass('recent');
         angular.element('td.selected').removeClass('lastClass');
         angular.element('.selected').last().addClass("lastClass");
+
+        var text = $('#table_info');
+        text.html("");
+        var lastElement = $( ".selected" ).last();
+        var numberOfRows = parseInt(lastElement.attr("data-rows"))+1;
+        var numberOfCols = parseInt(lastElement.attr("data-cols"))+1;
+        text.prepend("number of  Cols:" + numberOfCols +"<br/>"+"number of  Rows:" + numberOfRows);
     }
 };
 
 
-module.directive('formBuilder', ['$rootScope', function($rootScope) {
+module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $compile) {
         return {
             restrict: 'E',
             replace : true,
@@ -135,6 +136,22 @@ module.directive('formBuilder', ['$rootScope', function($rootScope) {
 
                 el.on("mouseover","td.selectable",function(e){
                     var currentTd = angular.element(e.target);
+                    if(scope.isMouseDown && currentTd.closest("tr").is(":last-child")) {
+                        var cloneTr = scope.destionation.closest("tr").clone();
+                        var numberOfTd = parseInt(currentTd.closest("tr").find("td").length);
+                        var trString = "<tr>";
+                        for(var i = 1 ; i <=numberOfTd; i++ ) {
+                            var td = "<td x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' class='selectable'></td>";
+                            trString = trString + td;
+                        }
+
+                        var tr = angular.element(trString);
+                        scope.table.append(tr);
+                        $compile(tr)(scope);
+
+                        $(".maxHeight").scrollTop(scope.table.height());
+                    }
+
                     scope.drawing(e.target);
 
                 });

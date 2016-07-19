@@ -8,19 +8,31 @@
     <script src="./source/jquery-2.2.4.js"></script>
     <script src="./source/angular.js"></script>
     <link href="./source/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="./bower_components/AngularJS-Toaster/toaster.min.css" rel="stylesheet" />
+    <script src="./bower_components/angular-animate/angular-animate.min.js" ></script>
+    <script src="./bower_components/AngularJS-Toaster/toaster.min.js" ></script>
+
     <link rel="stylesheet" type="text/css" href="source/css/bootstrap-combined.min.css">
     <link href="./source/css/myCss.css" rel="stylesheet">
     <script type="text/javascript" src="source/bootstrap.min.js"></script>
 
     <script src="./source/lvl-uuid.js"></script>
+    <script src="tab-builder.js"></script>
     <script src="drag-drop.js"></script>
     <script src="drag-drop.js"></script>
     <script src="form-builder.js"></script>
+
+
+
+
+
     <script type="text/javascript" src="app.js"></script>
 </head>
 
 <body ng-app="app" class="ng-scope">
     <div ng-controller="demoController" style="margin-top:50px;">
+        <toaster-container toaster-options="{'time-out': 3000, 'close-button':true, 'animation-class': 'toast-top-center'}"></toaster-container>
         <div class="maxHeight">
             <data-form-builder></data-form-builder>
         </div>
@@ -29,10 +41,12 @@
         <div class="btn-toolbar">
             <button type="button" class="btn btn-info" id="calculate">Show Table Info</button>
             <button type="button" class="btn btn-info" x-lvl-draggable="true" id="table_button">Table</button>
-            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="drag_me">Drag Me</button>
+            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="tab">Tab</button>
         </div>
 
-        <textarea class="span12" id="text" rows="5" id="dropHere" class="input-append"></textarea>
+        <div id="table_info"></div>
+        <br/>
+        <div id="tab_info"></div>
     </div>
 </body>
 

@@ -1,12 +1,12 @@
 .selectable.selected {
-    background: #f90;
+    background: #e9e9e9;
 }
 
 .selectable.droppedClass {
     background: #f90;
 }
 
-.lastClass {
+.lastClass,  .lastTabSelect {
     resize: both;
     overflow: auto;
 }
@@ -30,4 +30,8 @@ table.table-block tr td.selectable {
 .lvl-over {
     /* applied to a drop target when a draggable object is over it */
     border: 2px dashed black !important;
+}
+
+.selected_tab {
+    background: #ADD8E6 !important;
 }
