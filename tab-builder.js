@@ -1,9 +1,20 @@
 var module = angular.module("tab.builder", []);
 
 var tabBuilderController = function($scope) {
-
     $scope.table;
     $scope.isMouseDown;
+    $scope.tabNumber;
+
+    $scope.showTabInfo = function() {
+        angular.element("#orderTab").html($scope.tabNumber);
+        var selectedTr = angular.element('*[data-tab-number='+$scope.tabNumber+']');
+        angular.element("#tabFromRaw").html(parseInt(selectedTr.first().find("td:first").attr("data-rows"))+1);
+        angular.element("#tabtoRaw").html(parseInt(selectedTr.last().find("td:first").attr("data-rows"))+1);
+
+        angular.element("#tabFromCols").html(1);
+        angular.element("#tabtoCols").html(selectedTr.first().find("td").length);
+    };
+
 
     /**
      * call when mouse down.
@@ -12,8 +23,22 @@ var tabBuilderController = function($scope) {
      */
     $scope.startDrawing = function(currentTd) {
         $scope.isMouseDown = true;
-        currentTd.addClass("selected_tab").addClass('recentTab');
+        currentTd.addClass("selected_tab");
+        $scope.tabNumber = currentTd.closest("tr").attr("data-tab-number");
 
+        if(currentTd.hasClass("selected_tab")) {
+            angular.element('td').removeClass('selected-tab-border');
+
+            var selectedTr = angular.element('*[data-tab-number='+$scope.tabNumber+']');
+            selectedTr.find('td').each(function () {
+               if($(this).hasClass("selected_tab")) {
+                   $(this).addClass("selected-tab-border");
+               }
+            });
+
+            $scope.showTabInfo();
+
+        }
         return false; // prevent text selection
     };
 
@@ -25,35 +50,20 @@ var tabBuilderController = function($scope) {
     $scope.drawing = function(element) {
         var currentTd = angular.element(element);
         if ($scope.isMouseDown && currentTd.hasClass("selected")) {
-            console.log(currentTd);
             var closestTr = currentTd.closest("tr");
-
-
             closestTr.find("td.selected").each(function() {
                 $(this).addClass("selected_tab");
+                $(this).closest("tr").attr("data-tab-number", $scope.tabNumber)
             });
-
         }
-
     };
 
-    $scope.endDrawing = function(e) {
+    $scope.endDrawing = function() {
         $scope.isMouseDown = false;
+        angular.element('td.selected_tab').removeClass('lastTabSelect');
+        angular.element('.selected_tab').last().addClass("lastTabSelect");
 
-        angular.element('.selected_tab').last().addClass("lastClassTab");
-
-        var text = $('#tab_info');
-        text.html("");
-        var lastElement = $( ".selected_tab" ).last();
-        var firstElement = $( ".selected_tab" ).first();
-
-        var toRows = parseInt(lastElement.attr("data-rows"))+1;
-        var toCols = parseInt(lastElement.attr("data-cols"))+1;
-
-        var fromRows = parseInt(firstElement.attr("data-rows"))+1;
-        var fromCols = parseInt(firstElement.attr("data-cols"))+1;
-
-        text.prepend("From Rows " + fromRows + "   To rows " + toRows + "<br>" + " From cols " + fromCols + "   to Cols " + toCols );
+        $scope.showTabInfo();
     }
 
 };
@@ -65,22 +75,24 @@ module.directive('tabBuilder', ['$rootScope', function($rootScope) {
         scope : {},
         controller: tabBuilderController,
         link: function(scope, el, attrs, controller) {
+
             scope.table = angular.element(el);
 
             el.on("mousedown","td.selected_tab",function(e){
-                var currentTd = angular.element(e.target);
-                return scope.startDrawing(currentTd);
+                return scope.startDrawing(angular.element(e.target));
             });
 
             el.on("mouseover","td.selected",function(e){
-                var currentTd = angular.element(e.target);
-                scope.drawing(e.target);
+                scope.drawing(angular.element(e.target));
             });
 
-            el.on("mouseup", function(e){
-                scope.endDrawing(e);
+            $(document).on('mouseup', function(){
+                scope.endDrawing();
             });
 
+            el.on("selectstart","td.selected",function(e){
+                return false;
+            });
         }
 
     }

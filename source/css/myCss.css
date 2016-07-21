@@ -17,10 +17,10 @@ table.table-block tr td.selectable {
 
 .maxHeight {
     display: block;
-    height: 470px;
+    height: 362px;
     width: 95%;
     overflow-x: auto;
-    padding: 2%;
+    padding: 0%;
 }
 
 .clearfix {
@@ -35,3 +35,11 @@ table.table-block tr td.selectable {
 .selected_tab {
     background: #ADD8E6 !important;
 }
+.selected-field{
+    background: #ffb3b3 !important;
+}
+
+.selected-tab-border {
+    border:2px dashed #ffee5b !important;
+}
+

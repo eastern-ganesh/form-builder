@@ -22,31 +22,95 @@
     <script src="drag-drop.js"></script>
     <script src="drag-drop.js"></script>
     <script src="form-builder.js"></script>
+    <script>
+        $("tr.selected-list").css("display","none");
+       // $(".table-bordered tr.selected-list").css("display", "none");
 
-
-
-
-
+    </script>
     <script type="text/javascript" src="app.js"></script>
 </head>
 
 <body ng-app="app" class="ng-scope">
-    <div ng-controller="demoController" style="margin-top:50px;">
+    <div ng-controller="demoController">
         <toaster-container toaster-options="{'time-out': 3000, 'close-button':true, 'animation-class': 'toast-top-center'}"></toaster-container>
-        <div class="maxHeight">
-            <data-form-builder></data-form-builder>
-        </div>
-        <div class="clearfix"></div>
-    
         <div class="btn-toolbar">
-            <button type="button" class="btn btn-info" id="calculate">Show Table Info</button>
             <button type="button" class="btn btn-info" x-lvl-draggable="true" id="table_button">Table</button>
             <button type="button" class="btn btn-info" x-lvl-draggable="true" id="tab">Tab</button>
+            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="field">Field</button>
         </div>
+        <div class="clearfix"></div>
+        <div class="maxHeight">
 
-        <div id="table_info"></div>
-        <br/>
-        <div id="tab_info"></div>
+            <table class="table table-condensed table-bordered table-block" form-builder width="100%" id="table" tab-builder  tabRow= "{{tabRow}}" style="border-collapse: collapse;">
+                <tr ng-repeat="i in getNumber(selectedRows) track by $index" class="table-bordered-active">
+                    <td x-lvl-drop-target="true" x-on-drop="dropped(dragEl, dropEl)"
+                        ng-repeat="j in getNumber(selectedCols) track by $index" class="selectable"></td>
+                </tr>
+            </table>
+
+        </div>
+        <div class="clearfix"></div>
+
+
+
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#home">Table</a></li>
+                <li><a data-toggle="tab" href="#menu1">Tab</a></li>
+                <li><a data-toggle="tab" href="#menu2">Field</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="home" class="tab-pane fade in active">
+                    <h3>Table Property</h3>
+                    <table class="table table-condensed table-bordered table-block" style="width:50%">
+                        <tr>
+                            <td>Property</td>
+                            <td>value</td>
+                        </tr>
+                        <tr>
+                            <td>#Rows</td>
+                            <td><span id="tableRowCount">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>#Cols</td>
+                            <td><span id="tableColsCount">0</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="menu1" class="tab-pane fade">
+                    <h3>Tab</h3>
+                    <table class="table table-condensed table-bordered table-block" style="width:50%">
+                        <tr>
+                            <td>Property</td>
+                            <td>value</td>
+                        </tr>
+                        <tr>
+                            <td>From Row </td>
+                            <td><span id="tabFromRaw">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>To Row</td>
+                            <td><span id="tabtoRaw">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>From Cols</td>
+                            <td><span id="tabFromCols">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>To Cols</td>
+                            <td><span id="tabtoCols">0</span></td>
+                        </tr>
+                        <tr>
+                            <td>Order</td>
+                            <td><span id="orderTab">0</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="menu2" class="tab-pane fade">
+                    <h3>Menu 2</h3>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                </div>
+            </div>
     </div>
 </body>
 

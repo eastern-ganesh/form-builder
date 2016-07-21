@@ -1,10 +1,10 @@
 var app = angular.module('app', ['form.builder','lvl.directives.dragdrop','toaster', 'ngAnimate','tab.builder','lvl.services']);
 // register the directive with your app module
 app.controller('demoController', ['$scope','$rootScope','toaster','uuid','$compile', function($scope, $rootScope, toaster,uuid, $compile) {
-    $scope.selectedRows = 7;
-    $scope.selectedCols = 7;
-    $scope.table = angular.element("#table");
+    $scope.selectedRows = 6;
+    $scope.selectedCols = 6;
 
+    $scope.table = angular.element("#table");
     $scope.source;
     $scope.destionation;
 
@@ -38,14 +38,42 @@ app.controller('demoController', ['$scope','$rootScope','toaster','uuid','$compi
             closestTr.attr("id", id);
 
             var numberOfTab = parseInt($scope.table.find("[data-start-tab]").length)+1;
-
-
             closestTr.find("td.selected:first").html("<span>Tab "+numberOfTab+"</span>");
+            closestTr.attr("data-tab-number",numberOfTab);
             closestTr.find("td.selected:first").attr("data-start-tab",id);
             closestTr.find("td.selected").each(function() {
                 $(this).addClass("selected_tab")
             });
+            angular.element('td.selected_tab').removeClass('lastTabSelect');
+            angular.element('.selected_tab').last().addClass("lastTabSelect");
+
+            angular.element('td').removeClass('selected-tab-border');
+
+            closestTr.find('td').each(function () {
+                if($(this).hasClass("selected_tab")) {
+                    $(this).addClass("selected-tab-border");
+                }
+            });
         }
+    };
+
+
+    var doFieldSelection = function() {
+        if(!$scope.destionation.hasClass("selected")) {
+            console.log("Please enter field in table.");
+            return false;
+        }
+        if(!$scope.destionation.hasClass("selected_tab")) {
+            console.log("Please enter field in tab.");
+            return false;
+        }
+
+        if($scope.destionation.hasClass("selected-field")) {
+            console.log("Field already present please select another.");
+            return false;
+        }
+
+        $scope.destionation.addClass("selected-field");
     };
 
     $scope.dropped = function(src, dest) {
@@ -62,41 +90,18 @@ app.controller('demoController', ['$scope','$rootScope','toaster','uuid','$compi
             return false;
         }
 
+        if(src == "field") {
+            doFieldSelection();
+            return false;
+        }
+
         if($scope.table.find('td').hasClass("selected")) {
             return false;
         }
 
-
-
-
-        if($scope.destionation.closest("tr").is(":last-child")){
-            var cloneTr = $scope.destionation.closest("tr").clone();
-            var numberOfTd = parseInt($scope.destionation.closest("tr").find("td").length);
-            var trString = "<tr>";
-            for(var i = 1 ; i <=numberOfTd; i++ ) {
-                var td = "<td x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' class='selectable'></td>";
-                trString = trString + td;
-            }
-
-            var tr = angular.element(trString);
-            $scope.table.append(tr);
-            $compile(tr)($scope);
-
-            $(".maxHeight").scrollTop($scope.table.height());
-
-            if($scope.table.find('td').hasClass("lvl-over")) {
-                $scope.table.find('td').removeClass("lvl-over");
-            }
+        if(src == "table_button") {
+            $scope.$broadcast ('droppedTable', {"src" : src, "dest" : dest});
         }
 
-        $scope.destionation.addClass("selected marker lastClass");
-
-
     };
-
-    $rootScope.$on("LVL-DRAG-START", function() {
-        var tableElement = angular.element("#table").find('td').hasClass("selected");
-    });
-
-
 }]);

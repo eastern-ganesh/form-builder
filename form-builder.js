@@ -14,16 +14,11 @@ var formBuilderController = function($scope) {
      * @return {bool}
      */
     $scope.startDrawing = function(currentTd) {
-        if($scope.table.find('td').hasClass("selected") && !currentTd.hasClass("selected")) {
-            return false;
-        }
-
         if(currentTd.hasClass("lastClass")) {
-            $scope.isMouseDown = true; 
+            $scope.isMouseDown = true;
+            currentTd.addClass("selected").addClass('recent');
         }
-        currentTd.addClass("selected").addClass('recent');
-
-        if($scope.table.find('td').hasClass("marker") && currentTd.hasClass("selected")) {} 
+        if($scope.table.find('td').hasClass("marker") && currentTd.hasClass("selected")) {}
         else {
             currentTd.addClass("marker"); 
         }
@@ -39,8 +34,6 @@ var formBuilderController = function($scope) {
     $scope.drawing = function(element) {
         var currentTd = angular.element(element);
         if ($scope.isMouseDown && currentTd.hasClass("selectable")) {
-
-
             if (!currentTd.hasClass('recent')) {
                 currentTd.addClass("selected").addClass('recent');
             } else {
@@ -84,9 +77,14 @@ var formBuilderController = function($scope) {
                 $scope.table.find('tr:eq(' + y + ')').find('td:eq(' + x + ')').each(function(i, o) {
                     var th = $(this);
                     if (th.hasClass('selectable')) {
-                        if (th.hasClass('recent')) {} 
+                        if (th.hasClass('recent')) {}
                         else {
+                            th.closest("tr").addClass("selected-list");
                             th.addClass("selected").addClass('recent');
+                            var tabNumber = th.closest("tr").attr("data-tab-number");
+                            if(tabNumber) {
+                                th.closest("tr > td").addClass("selected_tab")
+                            }
                         }
                         th.attr('data-cols', columnNumber);
                         th.attr('data-rows', rowNumber);
@@ -104,34 +102,29 @@ var formBuilderController = function($scope) {
      * @param  {element}
      * @return {void}
      */
-    $scope.endDrawing = function(e) {
+    $scope.endDrawing = function() {
         $scope.isMouseDown = false;
         angular.element('td.selectable').removeClass('recent');
         angular.element('td.selected').removeClass('lastClass');
         angular.element('.selected').last().addClass("lastClass");
-
-        var text = $('#table_info');
-        text.html("");
-        var lastElement = $( ".selected" ).last();
-        var numberOfRows = parseInt(lastElement.attr("data-rows"))+1;
-        var numberOfCols = parseInt(lastElement.attr("data-cols"))+1;
-        text.prepend("number of  Cols:" + numberOfCols +"<br/>"+"number of  Rows:" + numberOfRows);
+        var lastElement = angular.element(".selected").last();
+        angular.element("#tableRowCount").html(parseInt(lastElement.attr("data-rows"))+1);
+        angular.element("#tableColsCount").html(parseInt(lastElement.attr("data-cols"))+1);
     }
 };
 
 
 module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $compile) {
         return {
-            restrict: 'E',
+            restrict: 'A',
             replace : true,
+            scope : false,
             controller: formBuilderController,
             link: function(scope, el, attrs, controller) {
                 scope.table = angular.element(el);
-                var self = scope;
-                
+
                 el.on("mousedown","td.selectable",function(e){
-                    var currentTd = angular.element(e.target);
-                    return scope.startDrawing(currentTd);
+                    return scope.startDrawing(angular.element(e.target));
                 });
 
                 el.on("mouseover","td.selectable",function(e){
@@ -156,15 +149,19 @@ module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $
 
                 });
 
-
-                el.on("mouseup", function(e){
-                    scope.endDrawing(e);
+                $(document).on('mouseup', function(){
+                    scope.endDrawing();
                 });
 
                 el.on("selectstart","td.selectable",function(e){
                     return false;
                 });
+
+                scope.$on('droppedTable', function(event, args) {
+                    angular.element("#"+args.dest).addClass("selected marker lastClass");
+                    angular.element("#tableRowCount").html(1);
+                    angular.element("#tableColsCount").html(1);
+                });
             },
-            templateUrl: 'form-builder.html'
         }
     }]);
