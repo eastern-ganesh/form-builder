@@ -129,8 +129,9 @@ module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $
 
                 el.on("mouseover","td.selectable",function(e){
                     var currentTd = angular.element(e.target);
+
                     if(scope.isMouseDown && currentTd.closest("tr").is(":last-child")) {
-                        var cloneTr = scope.destionation.closest("tr").clone();
+                        var cloneTr = currentTd.closest("tr").clone();
                         var numberOfTd = parseInt(currentTd.closest("tr").find("td").length);
                         var trString = "<tr>";
                         for(var i = 1 ; i <=numberOfTd; i++ ) {
