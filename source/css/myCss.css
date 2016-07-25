@@ -33,13 +33,31 @@ table.table-block tr td.selectable {
 }
 
 .selected_tab {
-    background: #ADD8E6 !important;
+    border:2px solid #ff8a18 !important;
 }
-.selected-field{
-    background: #ffb3b3 !important;
+.selected-field {
+    border:2px solid #522fe6 !important;
+    border-top: solid #522fe6 !important;
 }
 
 .selected-tab-border {
-    border:2px dashed #ffee5b !important;
+    border: 2px solid #31e62e !important;
+    border-top: solid #31e62e !important;
 }
 
+div.drag_button {
+    display:inline-block;
+    color:#444;
+    border:1px solid #CCC;
+    background:#DDD;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    cursor:pointer;
+    vertical-align:middle;
+    max-width: 100px;
+    padding: 5px;
+    text-align: center;
+}
+div.drag_button:active {
+    color:red;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+}

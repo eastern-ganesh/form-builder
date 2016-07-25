@@ -18,30 +18,25 @@
     <script type="text/javascript" src="source/bootstrap.min.js"></script>
 
     <script src="./source/lvl-uuid.js"></script>
-    <script src="tab-builder.js"></script>
     <script src="drag-drop.js"></script>
     <script src="drag-drop.js"></script>
     <script src="form-builder.js"></script>
-    <script>
-        $("tr.selected-list").css("display","none");
-       // $(".table-bordered tr.selected-list").css("display", "none");
-
-    </script>
+    <script src="tab-builder.js"></script>
+    <script src="field-builder.js"></script>
     <script type="text/javascript" src="app.js"></script>
 </head>
 
 <body ng-app="app" class="ng-scope">
-    <div ng-controller="demoController">
-        <toaster-container toaster-options="{'time-out': 3000, 'close-button':true, 'animation-class': 'toast-top-center'}"></toaster-container>
-        <div class="btn-toolbar">
-            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="table_button">Table</button>
-            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="tab">Tab</button>
-            <button type="button" class="btn btn-info" x-lvl-draggable="true" id="field">Field</button>
+    <div ng-controller="demoController as dm">
+        <div class="">
+            <div class="drag_button" x-lvl-draggable="true"  style="background-color : #e9e9e9;" id="table_button">Table</div>
+            <div class="drag_button" x-lvl-draggable="true"  style="background-color : #ADD8E6;" id="tab">Tab</div>
+            <div class="drag_button" x-lvl-draggable="true"  style="background-color : #31e62e" id="field">Field</div>
         </div>
         <div class="clearfix"></div>
         <div class="maxHeight">
 
-            <table class="table table-condensed table-bordered table-block" form-builder width="100%" id="table" tab-builder  tabRow= "{{tabRow}}" style="border-collapse: collapse;">
+            <table class="table table-condensed table-bordered table-block" form-builder width="100%" field-builder id="table" tab-builder  tabRow= "{{tabRow}}" style="border-collapse: collapse;">
                 <tr ng-repeat="i in getNumber(selectedRows) track by $index" class="table-bordered-active">
                     <td x-lvl-drop-target="true" x-on-drop="dropped(dragEl, dropEl)"
                         ng-repeat="j in getNumber(selectedCols) track by $index" class="selectable"></td>
@@ -50,9 +45,6 @@
 
         </div>
         <div class="clearfix"></div>
-
-
-
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#home">Table</a></li>
                 <li><a data-toggle="tab" href="#menu1">Tab</a></li>
@@ -77,12 +69,16 @@
                         </tr>
                     </table>
                 </div>
-                <div id="menu1" class="tab-pane fade">
+                <div id="menu1" class="tab-pane fade input-group">
                     <h3>Tab</h3>
                     <table class="table table-condensed table-bordered table-block" style="width:50%">
                         <tr>
-                            <td>Property</td>
-                            <td>value</td>
+                            <td><b>Property</b></td>
+                            <td><b>Value</b></td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td><input type="text" class="form-control" ng-model="tabName" id="tabName" ng-blur="updateTabName()"></td>
                         </tr>
                         <tr>
                             <td>From Row </td>

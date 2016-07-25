@@ -3,7 +3,7 @@ var module = angular.module("tab.builder", ['lvl.services']);
 var tabBuilderController = function($scope) {
     $scope.table;
     $scope.isMouseDown;
-    $scope.tabNumber;
+    $scope.tabNumber = 0;
 
     $scope.showTabInfo = function() {
         angular.element("#orderTab").html($scope.tabNumber);
@@ -13,6 +13,9 @@ var tabBuilderController = function($scope) {
 
         angular.element("#tabFromCols").html(1);
         angular.element("#tabtoCols").html(selectedTr.first().find("td").length);
+
+        var tabName = selectedTr.first().find("td:first").find("span").html();
+        angular.element("#tabName").val(tabName);
     };
 
 
@@ -24,12 +27,12 @@ var tabBuilderController = function($scope) {
     $scope.startDrawing = function(currentTd) {
         $scope.isMouseDown = true;
         $scope.tabNumber = currentTd.closest("tr").attr("data-tab-number");
-        angular.element('td').removeClass('selected-tab-border');
+
 
         var selectedTr = angular.element('*[data-tab-number='+$scope.tabNumber+']');
         selectedTr.find('td').each(function () {
             if($(this).hasClass("selected_tab")) {
-                $(this).addClass("selected-tab-border");
+                //$(this).addClass("selected-tab-border");
             }
         });
         $scope.showTabInfo();
@@ -46,7 +49,7 @@ var tabBuilderController = function($scope) {
             var closestTr = angular.element(element).closest("tr");
             closestTr.find("td.selected").each(function() {
                 $(this).addClass("selected_tab");
-                $(this).closest("tr").attr("data-tab-number", $scope.tabNumber);
+                $(this).closest("tr").attr("data-tab-id", $scope.tabNumber);
             });
         }
     };
@@ -57,6 +60,14 @@ var tabBuilderController = function($scope) {
         angular.element('.selected_tab').last().addClass("lastTabSelect");
 
         $scope.showTabInfo();
+    }
+    
+    $scope.updateTabName = function (tabName) {
+        console.log($scope.tabNumber);
+        if($scope.tabNumber) {
+            var selectedTr = angular.element('*[data-tab-number='+$scope.tabNumber+']');
+            selectedTr.first().find("td:first").find("span").html(tabName);
+        }
     }
 
 };
@@ -98,24 +109,29 @@ module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) 
                 var id = closestTr.attr("id");
                 if (!id) {
                     id = uuid.new();
-                    var numberOfTab = 0;
-                    numberOfTab = parseInt(scope.table.find("[data-tab-number]").length)+1;
-                    closestTr.attr("data-tab-number",numberOfTab);
+                    var tabNumber = parseInt(scope.table.find("[data-tab-number]").length)+1;
+                    closestTr.attr("data-tab-number", tabNumber);
+                    closestTr.closest("tr").attr("data-tab-id", tabNumber);
                     closestTr.find("td.selected").each(function() {
                         $(this).addClass("selected_tab")
                     });
-                    closestTr.find("td.selected:first").html("<span>Tab "+numberOfTab+"</span>");
+                    angular.element("#tabName").val("Tab " + tabNumber);
+                    closestTr.find("td.selected:first").html("<span>Tab "+tabNumber+"</span>");
 
                     angular.element('td.selected_tab').removeClass('lastTabSelect');
                     angular.element('.selected_tab').last().addClass("lastTabSelect");
-                    angular.element('td').removeClass('selected-tab-border');
+                    //angular.element('td').removeClass('selected-tab-border');
 
                     closestTr.find('td').each(function () {
                         if($(this).hasClass("selected_tab")) {
-                            $(this).addClass("selected-tab-border");
+                            //$(this).addClass("selected-tab-border");
                         }
                     });
                 }
+            });
+
+            scope.$on('updateTabName', function (event, args) {
+                scope.updateTabName(args.tabName);
             });
         }
     }

@@ -1,5 +1,5 @@
 var module = angular.module("lvl.directives.dragdrop", ['lvl.services','toaster', 'ngAnimate']);
-module.value('dropEvent', {dropEl:null, dragEl:null});
+
 module.directive('lvlDraggable', ['$rootScope','toaster', function($rootScope, toaster) {
     return {
         restrict: 'A',
@@ -24,7 +24,7 @@ module.directive('lvlDraggable', ['$rootScope','toaster', function($rootScope, t
     }
 }]);
 
-module.directive('lvlDropTarget', ['$rootScope','uuid','dropEvent', function($rootScope, uuid, dropEvent) {
+module.directive('lvlDropTarget', ['$rootScope','uuid', function($rootScope, uuid) {
     return {
         restrict: 'A',
         scope: {
@@ -38,15 +38,10 @@ module.directive('lvlDropTarget', ['$rootScope','uuid','dropEvent', function($ro
                 angular.element(el).attr("id", id);
             }
 
-            el.bind("dragover", function(eventObject) {
-                eventObject.preventDefault();
-            });
-
             el.bind("dragover", function(e) {
                 if (e.preventDefault) {
                     e.preventDefault(); // Necessary. Allows us to drop.
                 }
-
                 e.originalEvent.dataTransfer.dropEffect = 'move'; // See the section on the DataTransfer object.
                 return false;
             });
@@ -79,9 +74,6 @@ module.directive('lvlDropTarget', ['$rootScope','uuid','dropEvent', function($ro
             });
 
 
-            $rootScope.$on("LVL-DRAG-START", function() {
-                var el = document.getElementById(id);
-            });
 
             $rootScope.$on("LVL-DRAG-END", function() {
                 var el = document.getElementById(id);
