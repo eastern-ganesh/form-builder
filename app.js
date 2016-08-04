@@ -1,4 +1,4 @@
-var app = angular.module('app', ['form.builder','lvl.directives.dragdrop','tab.builder','field.builder']);
+var app = angular.module('app', ['form.builder','lvl.directives.dragdrop','tab.builder','field.builder','aggregation.builder','fieldgroup.builder']);
 // register the directive with your app module
 app.controller('demoController', ['$scope', function($scope) {
     var vm = this;
@@ -21,6 +21,16 @@ app.controller('demoController', ['$scope', function($scope) {
 
         if(src == "field") {
             $scope.$broadcast ('droppedField', {"src" : src, "dest" : dest});
+            return false;
+        }
+
+        if(src == "aggregation") {
+            $scope.$broadcast ('droppedAggreation', {"src" : src, "dest" : dest});
+            return false;
+        }
+
+        if(src == "field_group") {
+            $scope.$broadcast ('droppedFieldGroup', {"src" : src, "dest" : dest});
             return false;
         }
     };

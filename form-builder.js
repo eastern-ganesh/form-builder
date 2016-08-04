@@ -1,6 +1,6 @@
 var module = angular.module("form.builder", []);
 
-var formBuilderController = function($scope) {
+var formBuilderController = function($scope, $compile) {
     $scope.table;
     $scope.isMouseDown;
     $scope.firstClickedTr;
@@ -14,9 +14,10 @@ var formBuilderController = function($scope) {
      * @return {bool}
      */
     $scope.startDrawing = function(currentTd) {
+        var currentTd = currentTd.parents("td");
         if(currentTd.hasClass("lastClass")) {
             $scope.isMouseDown = true;
-            currentTd.addClass("selected").addClass('recent');
+            currentTd.addClass("selected recent");
         }
         if($scope.table.find('td').hasClass("marker") && currentTd.hasClass("selected")) {}
         else {
@@ -32,8 +33,9 @@ var formBuilderController = function($scope) {
      * @return {}
      */
     $scope.drawing = function(element) {
-        var currentTd = angular.element(element);
+        var currentTd = angular.element(element).parents("td");
         if ($scope.isMouseDown && currentTd.hasClass("selectable")) {
+
             if (!currentTd.hasClass('recent')) {
                 currentTd.addClass("selected").addClass('recent');
             } else {
@@ -45,9 +47,8 @@ var formBuilderController = function($scope) {
             $scope.firstClickedTr = $.inArray($(firstClickedCell).parent()[0], $scope.table.find('tr'));
             $scope.lastClickedTr = $.inArray(currentTd.parent()[0], $scope.table.find('tr'));
             $scope.firstClieckedTd = $.inArray(firstClickedCell, $(firstClickedCell).parent().find('td'));
-            $scope.lastClickedTd = $.inArray(element, currentTd.parent().find('td'));
-            
-            
+            $scope.lastClickedTd = $.inArray(currentTd.get(0), currentTd.parent().find('td'));
+
             // If end tr is greater the start tr then swap value
             if ($scope.firstClickedTr > $scope.lastClickedTr) {
                 var temp = $scope.lastClickedTr;
@@ -110,6 +111,44 @@ var formBuilderController = function($scope) {
         var lastElement = angular.element(".selected").last();
         angular.element("#tableRowCount").html(parseInt(lastElement.attr("data-rows"))+1);
         angular.element("#tableColsCount").html(parseInt(lastElement.attr("data-cols"))+1);
+
+        $scope.resetTable();
+    }
+
+    /**
+     * Reset table structure when it is resize
+     */
+    $scope.resetTable = function () {
+        $scope.table.find("[data-tab-id]").each(function () {
+            $(this).find("td.selected").addClass("selected_tab");
+            $(this).find("td.selected").removeClass("tabMark");
+            $(this).find("td.selected:first").addClass("tabMark");
+        });
+
+        $scope.table.find("[data-fielgroup-id]").each(function () {
+            $(this).find("td.selected").addClass("selected-fieldgroup");
+            $(this).find("td.selected").removeClass("fieldGroupMark");
+            $(this).find("td.selected:last").addClass("fieldGroupMark");
+        });
+    }
+
+    /**
+     * create element of new tr
+     * @param lastTd
+     * @returns {Object}
+     */
+    $scope.createNewTr = function (lastTd) {
+        var numberOfTd = parseInt(lastTd.closest("tr").find("td").length);
+        var trString = "<tr>";
+        for(var i = 1 ; i <=numberOfTd; i++ ) {
+            var td = "<td x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' class='selectable'><div></div></td>";
+            trString = trString + td;
+        }
+
+        var tr = angular.element(trString);
+        $scope.table.append(tr);
+        $compile(tr)($scope);
+        $(".maxHeight").scrollTop($scope.table.height());
     }
 };
 
@@ -127,27 +166,13 @@ module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $
                     return scope.startDrawing(angular.element(e.target));
                 });
 
-                el.on("mouseover","td.selectable",function(e){
-                    var currentTd = angular.element(e.target);
-
+                el.on("mouseover","td.selectable",function(e) {
+                    var currentTd = angular.element(e.target).parents('td');
                     if(scope.isMouseDown && currentTd.closest("tr").is(":last-child")) {
-                        var cloneTr = currentTd.closest("tr").clone();
-                        var numberOfTd = parseInt(currentTd.closest("tr").find("td").length);
-                        var trString = "<tr>";
-                        for(var i = 1 ; i <=numberOfTd; i++ ) {
-                            var td = "<td x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' class='selectable'></td>";
-                            trString = trString + td;
-                        }
-
-                        var tr = angular.element(trString);
-                        scope.table.append(tr);
-                        $compile(tr)(scope);
-
-                        $(".maxHeight").scrollTop(scope.table.height());
+                        scope.createNewTr(currentTd);
                     }
 
                     scope.drawing(e.target);
-
                 });
 
                 $(document).on('mouseup', function(){

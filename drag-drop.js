@@ -48,7 +48,7 @@ module.directive('lvlDropTarget', ['$rootScope','uuid', function($rootScope, uui
 
             el.bind("dragenter", function(e) {
                 var dragElement = angular.element(e.target);
-                dragElement.addClass('lvl-over');
+               // dragElement.addClass('lvl-over');
             });
 
             el.bind("dragleave", function(e) {
