@@ -28,7 +28,7 @@ var formBuilderController = function($scope, $compile) {
     };
 
     /**
-     * Call when mouse over is happend on td
+     * Call when mouse over is happened on td
      * @param  {currentTd}
      * @return {}
      */
@@ -103,7 +103,7 @@ var formBuilderController = function($scope, $compile) {
      * @param  {element}
      * @return {void}
      */
-    $scope.endDrawing = function() {
+    $scope.endDrawingTable = function() {
         $scope.isMouseDown = false;
         angular.element('td.selectable').removeClass('recent');
         angular.element('td.selected').removeClass('lastClass');
@@ -121,14 +121,17 @@ var formBuilderController = function($scope, $compile) {
     $scope.resetTable = function () {
         $scope.table.find("[data-tab-id]").each(function () {
             $(this).find("td.selected").addClass("selected_tab");
-            $(this).find("td.selected").removeClass("tabMark");
-            $(this).find("td.selected:first").addClass("tabMark");
         });
 
         $scope.table.find("[data-fielgroup-id]").each(function () {
+            var label = $(this).find("td.fieldGroupMark").find("div").attr("data-label");
+            if(label) {
+                $(this).find("td.fieldGroupMark").find("div").removeAttr("data-label");
+                $(this).find("td.fieldGroupMark").removeClass("fieldGroupMark");
+                $(this).find("td.selected:last").addClass("fieldGroupMark");
+                $(this).find("td.selected:last").find("div").attr("data-label", label);
+            }
             $(this).find("td.selected").addClass("selected-fieldgroup");
-            $(this).find("td.selected").removeClass("fieldGroupMark");
-            $(this).find("td.selected:last").addClass("fieldGroupMark");
         });
     }
 
@@ -176,7 +179,7 @@ module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $
                 });
 
                 $(document).on('mouseup', function(){
-                    scope.endDrawing();
+                    scope.endDrawingTable();
                 });
 
                 el.on("selectstart","td.selectable",function(e){

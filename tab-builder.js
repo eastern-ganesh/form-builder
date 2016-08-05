@@ -4,16 +4,17 @@ var tabBuilderController = function($scope) {
     $scope.table;
     $scope.isMouseDown;
     $scope.tabNumber = 0;
+    $scope.startTabElement = null;
 
     /**
      * call when mouse down.
      * @param  {currentId}
      * @return {bool}
      */
-    $scope.startDrawing = function(currentTd) {
+    $scope.startDrawingTab = function(currentTd) {
+        $scope.startTabElement = currentTd;
         $scope.isMouseDown = true;
         $scope.tabNumber = currentTd.closest("tr").attr("data-tab-id");
-
         angular.element('td').removeClass('selected-tab-active');
         var selectedTr = angular.element('*[data-tab-id='+$scope.tabNumber+']');
 
@@ -47,7 +48,22 @@ var tabBuilderController = function($scope) {
         }
     };
 
-    $scope.endDrawing = function() {
+    $scope.endDrawingTab = function() {
+        var tabName = null;
+        if($scope.isMouseDown && $scope.startTabElement) {
+            tabName = $scope.startTabElement.attr("data-label");
+            $scope.startTabElement.removeAttr("data-label");
+            $scope.startTabElement.parents("td").removeClass("tabMark");
+
+            var selectedTr = angular.element('*[data-tab-id='+$scope.tabNumber+']');
+            selectedTr.each(function (i, j) {
+                if((i+1) === selectedTr.length) {
+                    $(this).find("td.selected:first").addClass("tabMark");
+                    $(this).find("td.selected:first").find("div").attr("data-label", tabName);
+                }
+            });
+        }
+
         $scope.isMouseDown = false;
         angular.element('td').removeClass('lastTabSelect');
         angular.element('.selected_tab').last().addClass("lastTabSelect");
@@ -95,7 +111,7 @@ module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) 
             scope.table = angular.element(el);
 
             el.on("mousedown","td.tabMark",function(e){
-                return scope.startDrawing(angular.element(e.target));
+                return scope.startDrawingTab(angular.element(e.target));
             });
 
             el.on("mouseover","td.selected",function(e){
@@ -103,7 +119,7 @@ module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) 
             });
 
             $(document).on('mouseup', function(){
-                scope.endDrawing();
+                scope.endDrawingTab();
             });
 
             el.on("selectstart","td.selected",function(e){

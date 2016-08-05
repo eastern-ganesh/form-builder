@@ -4,6 +4,7 @@ var fieldGroupBuilderController = function($scope) {
     $scope.table;
     $scope.isMouseDownFieldGroup;
     $scope.tabNumberFieldGroup = 0;
+    $scope.startElementFieldGroup = null;
 
     /**
      * call when mouse down.
@@ -11,6 +12,7 @@ var fieldGroupBuilderController = function($scope) {
      * @return {bool}
      */
     $scope.startDrawingFieldGroup = function(currentTd) {
+        $scope.startElementFieldGroup = currentTd;
         $scope.isMouseDownFieldGroup = true;
         $scope.tabNumberFieldGroup = currentTd.closest("tr").attr("data-fielgroup-id");
         return false; // prevent text selection
@@ -38,6 +40,21 @@ var fieldGroupBuilderController = function($scope) {
     };
 
     $scope.endDrawingFieldGroup = function() {
+        var tabName = null;
+        if($scope.isMouseDownFieldGroup && $scope.startElementFieldGroup) {
+            tabName = $scope.startElementFieldGroup.attr("data-label");
+            $scope.startElementFieldGroup.removeAttr("data-label");
+            $scope.startElementFieldGroup.parents("td").removeClass("fieldGroupMark");
+
+            var selectedTr = angular.element('*[data-fielgroup-id='+$scope.tabNumberFieldGroup+']');
+            selectedTr.each(function (i, j) {
+                if((i+1) === selectedTr.length) {
+                    $(this).find("td.selected:last").addClass("fieldGroupMark");
+                    $(this).find("td.selected:last").find("div").attr("data-label", tabName);
+                }
+            });
+        }
+
         $scope.isMouseDownFieldGroup = false;
         $scope.tabNumberFieldGroup = 0;
     }
