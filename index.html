@@ -31,7 +31,7 @@
 <body ng-app="app" class="ng-scope">
     <div ng-controller="demoController as dm">
         <div class="">
-            <div class="drag_button" x-lvl-draggable="true"  style="color : black;" id="table_button">Table</div>
+            <div class="drag_button" x-lvl-draggable="true"  style="color : black;" id="table_button">Form</div>
             <div class="drag_button" x-lvl-draggable="true"  style="color : #ff8a18;" id="tab">Tab</div>
             <div class="drag_button" x-lvl-draggable="true"  style="color : #522fe6" id="field">Field</div>
             <div class="drag_button" x-lvl-draggable="true"  style="color : #7CFC00" id="aggregation">Aggregation</div>
@@ -53,14 +53,14 @@
         </div>
         <div class="clearfix"></div>
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#home">Table</a></li>
+                <li class="active"><a data-toggle="tab" href="#home">Form</a></li>
                 <li><a data-toggle="tab" href="#menu1">Tab</a></li>
                 <li><a data-toggle="tab" href="#menu2">Field</a></li>
             </ul>
 
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
-                    <h3>Table Property</h3>
+                    <h3>Form Property</h3>
                     <table class="table table-condensed table-bordered table-block" style="width:50%">
                         <tr>
                             <td>Property</td>
@@ -68,11 +68,11 @@
                         </tr>
                         <tr>
                             <td>#Rows</td>
-                            <td><span id="tableRowCount">0</span></td>
+                            <td><span id="tableRowCount">{{formInfo.rows}}</span></td>
                         </tr>
                         <tr>
                             <td>#Cols</td>
-                            <td><span id="tableColsCount">0</span></td>
+                            <td><span id="tableColsCount">{{formInfo.cols}}</span></td>
                         </tr>
                     </table>
                 </div>
@@ -94,14 +94,6 @@
                         <tr>
                             <td>To Row</td>
                             <td><span id="tabtoRaw">0</span></td>
-                        </tr>
-                        <tr>
-                            <td>From Cols</td>
-                            <td><span id="tabFromCols">0</span></td>
-                        </tr>
-                        <tr>
-                            <td>To Cols</td>
-                            <td><span id="tabtoCols">0</span></td>
                         </tr>
                         <tr>
                             <td>Order</td>

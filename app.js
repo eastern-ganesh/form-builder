@@ -6,6 +6,10 @@ app.controller('demoController', ['$scope', function($scope) {
     $scope.selectedCols = 7;
     $scope.tabName = "Tab 1";
 
+    $scope.formInfo = {"rows":0,"cols":0};
+    $scope.tabInfo = [];
+
+
     $scope.getNumber = function(num) {
         return new Array(num);
     };
@@ -38,4 +42,15 @@ app.controller('demoController', ['$scope', function($scope) {
     $scope.updateTabName = function() {
         $scope.$broadcast ('updateTabName', {"tabName" : $scope.tabName});
     }
+
+    $scope.showInformationOfTab = function() {
+        console.log($scope.tabInfo);
+    }
+
+    $scope.$on('updateTabInfo', function (event, args) {
+        angular.element("#orderTab").html(args.id);
+        angular.element("#tabFromRaw").html(args.fromRow);
+        angular.element("#tabtoRaw").html(args.toRow);
+        angular.element("#tabName").val(args.name);
+    });
 }]);

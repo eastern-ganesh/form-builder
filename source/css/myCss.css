@@ -10,7 +10,7 @@
 }
 .lastClass,  .lastTabSelect {
     resize: both;
-    overflow: auto;
+
 }
 table {
     border-collapse: collapse;

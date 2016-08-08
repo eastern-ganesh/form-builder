@@ -7,6 +7,7 @@ var formBuilderController = function($scope, $compile) {
     $scope.lastClickedTr;
     $scope.firstClieckedTd;
     $scope.lastClickedTd;
+
     
     /**
      * call when mouse down.
@@ -37,9 +38,9 @@ var formBuilderController = function($scope, $compile) {
         if ($scope.isMouseDown && currentTd.hasClass("selectable")) {
 
             if (!currentTd.hasClass('recent')) {
-                currentTd.addClass("selected").addClass('recent');
+                currentTd.addClass("selected recent");
             } else {
-                angular.element(".recent").removeClass('recent');//.removeClass('selected');
+                angular.element(".recent").removeClass('recent');
             }
 
             //get the cell where first click
@@ -63,7 +64,6 @@ var formBuilderController = function($scope, $compile) {
             }
             $scope.showSelected();
         }
-
     };
 
     /**
@@ -99,7 +99,7 @@ var formBuilderController = function($scope, $compile) {
     }
 
     /**
-     * stop when mouseover end
+     * stop when mouse over end
      * @param  {element}
      * @return {void}
      */
@@ -109,6 +109,9 @@ var formBuilderController = function($scope, $compile) {
         angular.element('td.selected').removeClass('lastClass');
         angular.element('.selected').last().addClass("lastClass");
         var lastElement = angular.element(".selected").last();
+        $scope.formInfo.rows = parseInt(lastElement.attr("data-rows"))+1;
+        $scope.formInfo.cols = parseInt(lastElement.attr("data-rows"))+1;
+
         angular.element("#tableRowCount").html(parseInt(lastElement.attr("data-rows"))+1);
         angular.element("#tableColsCount").html(parseInt(lastElement.attr("data-cols"))+1);
 
@@ -156,7 +159,7 @@ var formBuilderController = function($scope, $compile) {
 };
 
 
-module.directive('formBuilder', ['$rootScope','$compile', function($rootScope, $compile) {
+module.directive('formBuilder', ['$rootScope', function($rootScope) {
         return {
             restrict: 'A',
             replace : true,

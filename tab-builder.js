@@ -62,12 +62,14 @@ var tabBuilderController = function($scope) {
                     $(this).find("td.selected:first").find("div").attr("data-label", tabName);
                 }
             });
+
+            $scope.showTabInfo();
         }
 
         $scope.isMouseDown = false;
         angular.element('td').removeClass('lastTabSelect');
         angular.element('.selected_tab').last().addClass("lastTabSelect");
-        $scope.showTabInfo();
+
     }
 
     /**
@@ -75,7 +77,6 @@ var tabBuilderController = function($scope) {
      * @param tabName
      */
     $scope.updateTabName = function (tabName) {
-        console.log($scope.tabNumber);
         if($scope.tabNumber) {
             var selectedTr = angular.element('*[data-tab-number='+$scope.tabNumber+']');
             selectedTr.first().find("td:first").find("div").html(tabName);
@@ -86,17 +87,13 @@ var tabBuilderController = function($scope) {
      * Show tab info in table
      */
     $scope.showTabInfo = function() {
-        angular.element("#orderTab").html($scope.tabNumber);
         var selectedTr = angular.element('*[data-tab-id = '+$scope.tabNumber+']');
+        var tabInformation = { 'id' : $scope.tabNumber,
+            'name' : selectedTr.last().find("td.selected_tab:first").find("div").attr("data-label"),
+            "fromRow" : parseInt(selectedTr.first().find("td.selected_tab").attr("data-rows"))+1,
+            "toRow" : parseInt(selectedTr.last().find("td.selected_tab").attr("data-rows"))+1};
+        $scope.$emit('updateTabInfo', tabInformation);
 
-        angular.element("#tabFromRaw").html(parseInt(selectedTr.first().find("td:first").attr("data-rows"))+1);
-        angular.element("#tabtoRaw").html(parseInt(selectedTr.last().find("td:first").attr("data-rows"))+1);
-
-        angular.element("#tabFromCols").html(1);
-        angular.element("#tabtoCols").html(selectedTr.first().find("td").length);
-
-        var tabName = selectedTr.first().find("td:first").find("span").html();
-        angular.element("#tabName").val(tabName);
     };
 };
 
@@ -110,7 +107,7 @@ module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) 
 
             scope.table = angular.element(el);
 
-            el.on("mousedown","td.tabMark",function(e){
+            el.on("mousedown","td.tabMark",function(e) {
                 return scope.startDrawingTab(angular.element(e.target));
             });
 
@@ -130,7 +127,7 @@ module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) 
                 var destination = angular.element("#"+args.dest);
                 var closestTr = destination.closest("tr");
                 if(!destination.hasClass("selected")) {
-                    alert("Please select table first.")
+                    alert("Please select table first.");
                     return false;
                 }
 
