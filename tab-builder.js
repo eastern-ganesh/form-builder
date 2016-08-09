@@ -71,7 +71,7 @@ var tabBuilderController = function($scope) {
      * Show tab info in table
      */
     $scope.showTabInfo = function(tabNu) {
-        tabNumber = (tabNu != null) ? tabNumber : tabNumber;
+        tabNumber = (tabNu != null) ? tabNu : tabNumber;
         var selectedTr = angular.element('*[data-tab-id = '+tabNumber+']');
         var tabInformation = { 'id' : tabNumber,
             'name' : selectedTr.last().find("td.selected_tab:first").find("div").attr("data-label"),

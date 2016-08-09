@@ -1,10 +1,9 @@
 var module = angular.module("fieldgroup.builder", []);
 
 var fieldGroupBuilderController = function($scope) {
-    $scope.table;
-    $scope.isMouseDownFieldGroup;
-    $scope.tabNumberFieldGroup = 0;
-    $scope.startElementFieldGroup = null;
+    var isMouseDownField;
+    var fieldGroupNumber = 0;
+    var startElement;
 
     /**
      * call when mouse down.
@@ -12,9 +11,9 @@ var fieldGroupBuilderController = function($scope) {
      * @return {bool}
      */
     $scope.startDrawingFieldGroup = function(currentTd) {
-        $scope.startElementFieldGroup = currentTd;
-        $scope.isMouseDownFieldGroup = true;
-        $scope.tabNumberFieldGroup = currentTd.closest("tr").attr("data-fielgroup-id");
+        startElement = currentTd;
+        isMouseDownField = true;
+        fieldGroupNumber = currentTd.closest("tr").attr("data-fielgroup-id");
         return false; // prevent text selection
     };
 
@@ -24,45 +23,66 @@ var fieldGroupBuilderController = function($scope) {
      * @return {}
      */
     $scope.drawingFieldGroup = function(element) {
-        if ($scope.isMouseDownFieldGroup) {
+        if (isMouseDownField) {
             var closestTr = angular.element(element).closest("tr");
             if(!closestTr.attr("data-fielgroup-id")) {
                 closestTr.find("td.selected").each(function() {
                     $(this).addClass("selected-fieldgroup");
-                    $(this).closest("tr").attr("data-fielgroup-id", $scope.tabNumberFieldGroup);
+                    $(this).closest("tr").attr("data-fielgroup-id", fieldGroupNumber);
                 });
             } else {
                 console.log("Invalid row selection " + closestTr.attr("id"));
-                $scope.isMouseDownFieldGroup = false;
+                isMouseDownField = false;
                 return false;
             }
         }
     };
 
+    /**
+     * set information when drawing end
+     */
     $scope.endDrawingFieldGroup = function() {
         var tabName = null;
-        if($scope.isMouseDownFieldGroup && $scope.startElementFieldGroup) {
-            tabName = $scope.startElementFieldGroup.attr("data-label");
-            $scope.startElementFieldGroup.removeAttr("data-label");
-            $scope.startElementFieldGroup.parents("td").removeClass("fieldGroupMark");
+        if(isMouseDownField && startElement) {
+            tabName = startElement.attr("data-label");
+            startElement.removeAttr("data-label");
+            startElement.parents("td").removeClass("fieldGroupMark");
+            angular.element('td').removeClass('selected-fieldgroup-active');
 
-            var selectedTr = angular.element('*[data-fielgroup-id='+$scope.tabNumberFieldGroup+']');
-            selectedTr.each(function (i, j) {
-                if((i+1) === selectedTr.length) {
-                    $(this).find("td.selected:last").addClass("fieldGroupMark");
-                    $(this).find("td.selected:last").find("div").attr("data-label", tabName);
-                }
-            });
+            var selectedTr = angular.element('*[data-fielgroup-id='+ fieldGroupNumber+']');
+            selectedTr.find("td.selected-fieldgroup").addClass("selected-fieldgroup-active");
+            selectedTr.last().find("td.selected:last").addClass("fieldGroupMark");
+            selectedTr.last().find("td.selected:last").find("div").attr("data-label", tabName);
+            $scope.showFieldGroupInfo(null);
+
         }
-
-        $scope.isMouseDownFieldGroup = false;
-        $scope.tabNumberFieldGroup = 0;
+        isMouseDownField = false;
+        fieldGroupNumber = 0;
     }
 
+    /**
+     * Show tab info in table
+     */
+    $scope.showFieldGroupInfo = function(tabNu) {
+       fieldGroupNumber = (tabNu != null) ? tabNu : fieldGroupNumber;
+        var selectedTr = angular.element('*[data-fielgroup-id = '+fieldGroupNumber+']');
+        var tabInformation = { 'id' : fieldGroupNumber,
+            'name' : selectedTr.last().find("td.selected-fieldgroup:last").find("div").attr("data-label"),
+            "fromRow" : parseInt(selectedTr.first().find("td.selected-fieldgroup").attr("data-rows"))+1,
+            "toRow" : parseInt(selectedTr.last().find("td.selected-fieldgroup").attr("data-rows"))+1};
+        $scope.$emit('updateFieldGroupInfo', tabInformation);
+    };
 
-
-
-
+    /**
+     * update field group name
+     * @param groupName
+     */
+    $scope.updateGroupName = function (groupName) {
+        if(fieldGroupNumber) {
+            var selectedTr = angular.element('*[data-fielgroup-id='+fieldGroupNumber+']');
+            selectedTr.last().find("td.selected-fieldgroup:last").find("div").attr("data-label", groupName)
+        }
+    }
 };
 
 module.directive('fieldgroupBuilder', ['$rootScope', function($rootScope) {
@@ -85,33 +105,27 @@ module.directive('fieldgroupBuilder', ['$rootScope', function($rootScope) {
                 scope.endDrawingFieldGroup();
             });
 
-            scope.$on('droppedFieldGroup', function(event, args) {
-                var destination = angular.element("#" + args.dest);
-                var closestTr = destination.closest("tr");
-
+            scope.$on('droppedFieldGroup', function(event, destination) {
                 if(!destination.hasClass("selected")) {
                     alert("Please select table first.")
                     return false;
                 }
-
-                if(closestTr.attr("data-fielgroup-id")) {
+                if(destination.hasClass("selected-fieldgroup")) {
                     alert("Field Group already selected");
                     return false;
                 }
-
-                var fieldGroupNumber = parseInt(scope.table.find("[data-fielgroup-id]").length)+1;
+                angular.element('td').removeClass('selected-fieldgroup-active');
+                var fieldGroupNumber = parseInt(angular.element(el).find(".fieldGroupMark").length)+1;
+                var closestTr = destination.closest("tr");
                 closestTr.attr("data-fielgroup-id", fieldGroupNumber);
                 closestTr.closest("tr").attr("data-fielgroup-id", fieldGroupNumber);
-                closestTr.find("td.selected").each(function() {
-                    $(this).addClass("selected-fieldgroup");
-                });
+                closestTr.find("td.selected").addClass("selected-fieldgroup selected-fieldgroup-active");
 
                 var userFieldGroupName = prompt("Please enter Field Group name.");
-                if (userFieldGroupName == null) {
-                    userFieldGroupName = "Tab "+userFieldGroupName;
-                }
+                userFieldGroupName = (userFieldGroupName == null) ? "FieldGroup "+fieldGroupNumber : userFieldGroupName;
                 closestTr.find("td.selected:last").addClass("fieldGroupMark");
                 closestTr.find("td.selected:last").find("div").attr("data-label",userFieldGroupName);
+                scope.showFieldGroupInfo(fieldGroupNumber);
             });
         },
     }

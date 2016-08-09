@@ -1,39 +1,60 @@
 var module = angular.module("field.builder", []);
 
 var fieldBuilderController = function($scope) {
-    $scope.mouseDown = false;
-    $scope.tabNumber = null;
-    $scope.closestTrId = null;
+    var mouseDownField = false;
+    var closestTrId = null;
+    var draggedDivContent;
+    var startId;
 
     $scope.startSelectionField = function(element) {
-        $scope.draggedDivContent = element.text();
-        $scope.mouseDown = true;
-        $scope.tabNumber = element.closest("tr").attr("data-tab-id");
-        $scope.closestTrId = element.closest("tr").attr("id");
+        draggedDivContent = element.text();
+        mouseDownField = true;
+        closestTrId = element.closest("tr").attr("id");
+        startId = element.closest("td").attr("data-field-id");
     };
 
     $scope.fieldSelection = function(element) {
         var currentSelection = angular.element(element).parents("td");
-        if($scope.mouseDown && currentSelection.hasClass("selected-aggregation")) {
-            $scope.mouseDown = false;
+        if(mouseDownField && currentSelection.hasClass("selected-aggregation")) {
+            mouseDownField = false;
             alert("Aggregation already exist.");
             return false;
         }
-        if($scope.mouseDown && !currentSelection.hasClass("selected-field") &&
-            currentSelection.closest("tr").attr("id") === $scope.closestTrId) {
+        if(mouseDownField && !currentSelection.hasClass("selected-field") &&
+            currentSelection.closest("tr").attr("id") === closestTrId) {
 
             currentSelection.addClass("selected-field");
-            if($scope.draggedDivContent != null) {
-                currentSelection.find("div").html($scope.draggedDivContent);
+            currentSelection.attr("data-field-id", startId);
+            if(draggedDivContent != null) {
+                currentSelection.find("div").html(draggedDivContent);
             }
-
         }
     };
 
     $scope.endFieldSelection = function() {
-        $scope.mouseDown = false;
-        $scope.tabNumber = null;
-        $scope.draggedDivContent = null;
+        if(mouseDownField) {
+            angular.element('td').removeClass('selected-field-active');
+            var selectedTd = angular.element('*[data-field-id='+startId+']');
+            selectedTd.addClass("selected-field-active");
+            $scope.showFieldInfo(null);
+        }
+        mouseDownField = false;
+        draggedDivContent = null;
+    };
+
+    /**
+     * Show tab info in table
+     */
+    $scope.showFieldInfo = function(fieldNu) {
+        startId = (fieldNu == null) ? startId : fieldNu;
+        console.log(startId);
+        var selectedTr = angular.element('*[data-field-id = '+startId+']');
+        var tabInformation = { 'id' : startId,
+            'name' : selectedTr.first().find("div").html(),
+            "row" : parseInt(selectedTr.first().attr("data-rows"))+1,
+            "fromCols" : parseInt(selectedTr.first().attr("data-cols"))+1,
+            "toCols" : parseInt(selectedTr.last().attr("data-cols"))+1};
+        $scope.$emit('updateFieldInfo', tabInformation);
     };
 };
 
@@ -57,8 +78,7 @@ module.directive('fieldBuilder', ['$rootScope', function($rootScope) {
                 scope.endFieldSelection();
             });
 
-            scope.$on('droppedField', function(event, args) {
-                var destination = angular.element("#" + args.dest);
+            scope.$on('droppedField', function(event, destination) {
                 if(destination.hasClass("selected-field")) {
                     alert("Field already exist.");
                     return false;
@@ -68,15 +88,18 @@ module.directive('fieldBuilder', ['$rootScope', function($rootScope) {
                     return false;
                 }
                 if(destination.hasClass("selected")) {
-                    angular.element("#"+args.dest).addClass("selected-field");
-                    var userFieldName = prompt("Please enter Field name.");
-                    if (userFieldName == null) {
-                        userFieldName = "Field";
-                    }
-                    angular.element("#"+args.dest).find("div").html(userFieldName);
+                    angular.element('td').removeClass('selected-field-active');
+                    var numberOfField = parseInt(angular.element(el).find(".selected-field-mark").length)+1;
+                    destination.addClass("selected-field selected-field-mark selected-field-active");
+                    destination.attr("data-field-id", numberOfField);
+
+                    destination.addClass("selected-field");
+                    var userFieldName = prompt("Please enter tab Name.");
+                    userFieldName = (userFieldName == null) ? "Field " : userFieldName;
+                    destination.find("div").html(userFieldName);
+                    scope.showFieldInfo(numberOfField);
                 }
             });
-
         },
     }
 }]);
