@@ -10,6 +10,7 @@ app.controller('demoController', ['$scope', function($scope) {
     $scope.tabInfo = [];
 
 
+
     $scope.getNumber = function(num) {
         return new Array(num);
     };
@@ -20,7 +21,7 @@ app.controller('demoController', ['$scope', function($scope) {
             $scope.$broadcast ('droppedTable', {"src" : src, "dest" : dest});
         }
         if(src == "tab") {
-            $scope.$broadcast ('droppedTab', {"src" : src, "dest" : dest});
+            $scope.$broadcast ('droppedTab', angular.element("#"+dest));
         }
 
         if(src == "field") {
@@ -40,17 +41,12 @@ app.controller('demoController', ['$scope', function($scope) {
     };
 
     $scope.updateTabName = function() {
-        $scope.$broadcast ('updateTabName', {"tabName" : $scope.tabName});
-    }
-
-    $scope.showInformationOfTab = function() {
-        console.log($scope.tabInfo);
+        $scope.$broadcast ('updateTabName', {"tabName" : $scope.tabInfo.name});
     }
 
     $scope.$on('updateTabInfo', function (event, args) {
-        angular.element("#orderTab").html(args.id);
-        angular.element("#tabFromRaw").html(args.fromRow);
-        angular.element("#tabtoRaw").html(args.toRow);
-        angular.element("#tabName").val(args.name);
+        $scope.tabInfo = args;
+        $scope.$apply();
     });
+
 }]);

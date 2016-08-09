@@ -29,7 +29,7 @@
 </head>
 
 <body ng-app="app" class="ng-scope">
-    <div ng-controller="demoController as dm">
+    <div ng-controller="demoController">
         <div class="">
             <div class="drag_button" x-lvl-draggable="true"  style="color : black;" id="table_button">Form</div>
             <div class="drag_button" x-lvl-draggable="true"  style="color : #ff8a18;" id="tab">Tab</div>
@@ -85,19 +85,19 @@
                         </tr>
                         <tr>
                             <td>Name</td>
-                            <td><input type="text" class="form-control" ng-model="tabName" id="tabName" ng-blur="updateTabName()"></td>
+                            <td><input type="text" class="form-control" ng-model="tabInfo.name" id="tabName" ng-blur="updateTabName()"></td>
                         </tr>
                         <tr>
                             <td>From Row </td>
-                            <td><span id="tabFromRaw">0</span></td>
+                            <td><span id="tabFromRaw">{{tabInfo.fromRow}}</span></td>
                         </tr>
                         <tr>
                             <td>To Row</td>
-                            <td><span id="tabtoRaw">0</span></td>
+                            <td><span id="tabtoRaw">{{tabInfo.toRow}}</span></td>
                         </tr>
                         <tr>
                             <td>Order</td>
-                            <td><span id="orderTab">0</span></td>
+                            <td><span id="orderTab">{{tabInfo.id}}</span></td>
                         </tr>
                     </table>
                 </div>

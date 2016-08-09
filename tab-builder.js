@@ -1,10 +1,9 @@
-var module = angular.module("tab.builder", ['lvl.services']);
+var module = angular.module("tab.builder", []);
 
 var tabBuilderController = function($scope) {
-    $scope.table;
-    $scope.isMouseDown;
-    $scope.tabNumber = 0;
-    $scope.startTabElement = null;
+    var isMouseDown;
+    var startTabElement = null;
+    var tabNumber = 0;
 
     /**
      * call when mouse down.
@@ -12,18 +11,9 @@ var tabBuilderController = function($scope) {
      * @return {bool}
      */
     $scope.startDrawingTab = function(currentTd) {
-        $scope.startTabElement = currentTd;
-        $scope.isMouseDown = true;
-        $scope.tabNumber = currentTd.closest("tr").attr("data-tab-id");
-        angular.element('td').removeClass('selected-tab-active');
-        var selectedTr = angular.element('*[data-tab-id='+$scope.tabNumber+']');
-
-        selectedTr.find('td').each(function () {
-            if($(this).hasClass("selected_tab")) {
-                $(this).addClass("selected-tab-active");
-            }
-        });
-        $scope.showTabInfo();
+        startTabElement = currentTd;
+        isMouseDown = true;
+        tabNumber = currentTd.closest("tr").attr("data-tab-id");
         return false; // prevent text selection
     };
 
@@ -33,16 +23,16 @@ var tabBuilderController = function($scope) {
      * @return {}
      */
     $scope.drawing = function(element) {
-        if ($scope.isMouseDown) {
+        if (isMouseDown) {
             var closestTr = angular.element(element).closest("tr");
             if(!closestTr.attr("data-tab-id")) {
                 closestTr.find("td.selected").each(function() {
                     $(this).addClass("selected_tab");
-                    $(this).closest("tr").attr("data-tab-id", $scope.tabNumber);
+                    $(this).closest("tr").attr("data-tab-id", tabNumber);
                 });
             } else {
                 console.log("Invalid row selection " + closestTr.attr("id"));
-                $scope.isMouseDown = false;
+                isMouseDown = false;
                 return false;
             }
         }
@@ -50,26 +40,20 @@ var tabBuilderController = function($scope) {
 
     $scope.endDrawingTab = function() {
         var tabName = null;
-        if($scope.isMouseDown && $scope.startTabElement) {
-            tabName = $scope.startTabElement.attr("data-label");
-            $scope.startTabElement.removeAttr("data-label");
-            $scope.startTabElement.parents("td").removeClass("tabMark");
+        if(isMouseDown && startTabElement) {
+            tabName = startTabElement.attr("data-label");
+            startTabElement.removeAttr("data-label");
+            startTabElement.parents("td").removeClass("tabMark");
+            angular.element('td').removeClass('selected-tab-active');
 
-            var selectedTr = angular.element('*[data-tab-id='+$scope.tabNumber+']');
-            selectedTr.each(function (i, j) {
-                if((i+1) === selectedTr.length) {
-                    $(this).find("td.selected:first").addClass("tabMark");
-                    $(this).find("td.selected:first").find("div").attr("data-label", tabName);
-                }
-            });
-
-            $scope.showTabInfo();
+            var selectedTr = angular.element('*[data-tab-id='+tabNumber+']');
+            selectedTr.find("td.selected_tab").addClass("selected-tab-active");
+            selectedTr.last().find("td.selected:first").addClass("tabMark");
+            selectedTr.last().find("td.selected:first").find("div").attr("data-label", tabName);
+            $scope.showTabInfo(null);
         }
 
-        $scope.isMouseDown = false;
-        angular.element('td').removeClass('lastTabSelect');
-        angular.element('.selected_tab').last().addClass("lastTabSelect");
-
+        isMouseDown = false;
     }
 
     /**
@@ -77,36 +61,33 @@ var tabBuilderController = function($scope) {
      * @param tabName
      */
     $scope.updateTabName = function (tabName) {
-        if($scope.tabNumber) {
-            var selectedTr = angular.element('*[data-tab-number='+$scope.tabNumber+']');
-            selectedTr.first().find("td:first").find("div").html(tabName);
+        if(tabNumber) {
+            var selectedTr = angular.element('*[data-tab-id='+tabNumber+']');
+            selectedTr.last().find("td.selected_tab:first").find("div").attr("data-label", tabName);
         }
     }
 
     /**
      * Show tab info in table
      */
-    $scope.showTabInfo = function() {
-        var selectedTr = angular.element('*[data-tab-id = '+$scope.tabNumber+']');
-        var tabInformation = { 'id' : $scope.tabNumber,
+    $scope.showTabInfo = function(tabNu) {
+        tabNumber = (tabNu != null) ? tabNumber : tabNumber;
+        var selectedTr = angular.element('*[data-tab-id = '+tabNumber+']');
+        var tabInformation = { 'id' : tabNumber,
             'name' : selectedTr.last().find("td.selected_tab:first").find("div").attr("data-label"),
             "fromRow" : parseInt(selectedTr.first().find("td.selected_tab").attr("data-rows"))+1,
             "toRow" : parseInt(selectedTr.last().find("td.selected_tab").attr("data-rows"))+1};
         $scope.$emit('updateTabInfo', tabInformation);
-
     };
 };
 
-module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) {
+module.directive('tabBuilder', ['$rootScope', function($rootScope) {
     return {
         restrict: 'A',
         replace : true,
         scope : {},
         controller: tabBuilderController,
         link: function(scope, el, attrs, controller) {
-
-            scope.table = angular.element(el);
-
             el.on("mousedown","td.tabMark",function(e) {
                 return scope.startDrawingTab(angular.element(e.target));
             });
@@ -123,44 +104,28 @@ module.directive('tabBuilder', ['$rootScope','uuid', function($rootScope, uuid) 
                 return false;
             });
 
-            scope.$on('droppedTab', function(event, args) {
-                var destination = angular.element("#"+args.dest);
-                var closestTr = destination.closest("tr");
+            scope.$on('droppedTab', function(event, destination) {
                 if(!destination.hasClass("selected")) {
                     alert("Please select table first.");
                     return false;
                 }
-
-                if(closestTr.attr("data-tab-id")) {
+                if(destination.hasClass("selected_tab")) {
                     alert("Tab already selected");
                     return false;
                 }
 
-                var tabNumber = parseInt(scope.table.find("[data-tab-number]").length)+1;
-                closestTr.attr("data-tab-number", tabNumber);
+                angular.element('td').removeClass('selected-tab-active');
+                var tabNumber = parseInt(angular.element(el).find(".tabMark").length)+1;
+
+                var closestTr = destination.closest("tr");
                 closestTr.closest("tr").attr("data-tab-id", tabNumber);
-                closestTr.find("td.selected").each(function() {
-                    $(this).addClass("selected_tab");
-                });
+                closestTr.find("td.selected").addClass("selected_tab selected-tab-active");
 
                 var userTabName = prompt("Please enter tab Name.");
-                if (userTabName == null) {
-                    userTabName = "Tab "+tabNumber;
-                }
-
+                userTabName = (userTabName == null) ? "Tab "+tabNumber : userTabName;
                 closestTr.find("td.selected:first").find("div").attr("data-label", userTabName);
-                angular.element("#tabName").val(userTabName);
-
                 closestTr.find("td.selected:first").addClass("tabMark");
-                angular.element('td.selected_tab').removeClass('lastTabSelect');
-                angular.element('.selected_tab').last().addClass("lastTabSelect");
-                angular.element('td').removeClass('selected-tab-active');
-
-                closestTr.find('td').each(function () {
-                    if($(this).hasClass("selected_tab")) {
-                        $(this).addClass("selected-tab-active");
-                    }
-                });
+                scope.showTabInfo(tabNumber);
             });
 
             scope.$on('updateTabName', function (event, args) {
